@@ -1,4 +1,4 @@
-# Express Best Practices
+# Server - Express Best Practices
 
 ## Folder Structure
 

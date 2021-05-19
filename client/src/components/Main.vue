@@ -1,24 +1,17 @@
 <template>
   <div class="main">
-    <h1>{{ title }}</h1>
+    <h1>Task Management</h1>
     <img
       v-if="user && user.photoURL !== null"
       style="border-radius: 50%; width: 100px"
       :src="user.photoURL"
     />
     <div class="buttons">
-      <button v-if="!user" @click="userLogin">Login</button>
-      <button v-else @click="userLogout">Logout</button>
+      <button class="primary" v-if="!user" @click="userLogin">Login</button>
+      <button class="secondary" v-else @click="userLogout">Logout</button>
     </div>
     <section v-if="user && user.uid !== null">
       <Tasks />
-      <pre><code>{{$store.state}}</code></pre>
-      <!-- <div>
-        id, display, photo, email
-        <ul v-for="(key, i) in user" :key="i">
-          <li>{{ key }}</li>
-        </ul>
-      </div> -->
     </section>
   </div>
 </template>
@@ -29,12 +22,8 @@
   import 'firebase/auth';
   import Tasks from './Tasks.vue';
 
-  // console.log(sessionStorage);
-
   export default {
     name: 'Main',
-    props: ['title'],
-
     methods: {
       userLogout() {
         auth.signOut();
@@ -73,19 +62,6 @@
       token() {
         return this.$store.getters.getToken;
       },
-
-      // uid() {
-      //   return this.user.uid || null;
-      // },
-      // displayName() {
-      //   return this.user.displayName || null;
-      // },
-      // photoURL() {
-      //   return this.user.photoURL || null;
-      // },
-      // email() {
-      //   return this.user.email || null;
-      // },
     },
     components: {
       Tasks,
@@ -93,7 +69,6 @@
   };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   h3 {
     margin: 40px 0 0;
@@ -106,7 +81,14 @@
     display: inline-block;
     margin: 0 10px;
   }
-  a {
-    color: #42b983;
+
+  .primary {
+    background-color: #275a90;
+    color: #fff;
+  }
+
+  .secondary {
+    background-color: #f44336;
+    color: #fff;
   }
 </style>

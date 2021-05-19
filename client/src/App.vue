@@ -1,6 +1,6 @@
 <template>
   <section>
-    <Main title="Databass Task Manager" @click="outsideCloseMenu" />
+    <Main></Main>
     <Menu :show="showMenu">
       <a @click="toggleMenu" :class="showMenu ? 'hb small' : 'hb'">
         <strong>
@@ -8,12 +8,19 @@
         </strong>
       </a>
     </Menu>
+    <!-- {{ alertPopup }} -->
+    <Alert
+      v-if="alertPopup.active"
+      class="alert"
+      :message="alertPopup.message"
+    />
   </section>
 </template>
 
 <script>
   import Main from './components/Main.vue';
   import Menu from './components/Menu.vue';
+  import Alert from './components/Alert.vue';
 
   export default {
     name: 'App',
@@ -32,9 +39,15 @@
         }
       },
     },
+    computed: {
+      alertPopup() {
+        return this.$store.getters.getAlert;
+      },
+    },
     components: {
       Main,
       Menu,
+      Alert,
     },
   };
 </script>
@@ -47,6 +60,14 @@
     text-align: center;
     color: black;
     margin-top: 60px;
+  }
+
+  .alert {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    margin: 10px;
+    padding: 10px;
   }
 
   .hb {

@@ -5,7 +5,10 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import { auth } from './firebase';
 
-let app = createApp(App).use(store);
+let app = createApp(App);
+
+app.use(store);
+
 app.mount('#app');
 
 auth.onAuthStateChanged((user) => {
@@ -14,8 +17,6 @@ auth.onAuthStateChanged((user) => {
   } else {
     store.dispatch('setUser', null);
   }
-
-  // let token;
 
   const thisUser = store.getters.getUser;
   const thisUserToken = store.getters.getToken;

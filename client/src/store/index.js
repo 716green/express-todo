@@ -9,6 +9,11 @@ export const store = createStore({
     user: null,
     token: null,
     tasks: null,
+    showArchived: false,
+    alert: {
+      message: '',
+      active: false,
+    },
   },
   getters: {
     getUser(state) {
@@ -20,6 +25,20 @@ export const store = createStore({
     getTasks(state) {
       return state.tasks;
     },
+    getActiveTasks(state) {
+      return state?.tasks?.userTasks?.filter((task) => {
+        return task.status === 'active';
+      });
+    },
+    getArchivedTasks(state) {
+      return state?.tasks?.archived?.sort((a, b) => a.urgency - b.urgency);
+    },
+    getShowArchived(state) {
+      return state.showArchived;
+    },
+    getAlert(state) {
+      return state.alert;
+    },
   },
   mutations: {
     SET_USER(state, user) {
@@ -30,9 +49,24 @@ export const store = createStore({
     },
     SET_TASKS(state, tasks) {
       state.tasks = tasks;
+      console.log(state.tasks);
+    },
+    TOGGLE_SHOW_ARCHIVED(state, value) {
+      state.showArchived = value;
+    },
+    SET_ALERT(state, payload) {
+      const { message, active } = payload;
+      state.alert.message = message;
+      state.alert.active = active;
+      if (active) {
+        store.dispatch('resetAlert');
+      }
     },
   },
   actions: {
+    toggleShowArchived({ commit, state }) {
+      commit('TOGGLE_SHOW_ARCHIVED', !state.showArchived);
+    },
     setUser({ commit }, user) {
       let userInfo = null;
       if (user) {
@@ -65,6 +99,31 @@ export const store = createStore({
         .catch((error) => {
           console.log('Error getting document:', error);
         });
+    },
+    updateTasks({ commit }, payload) {
+      const { username, newActiveTasks } = payload;
+      const docRef = db.collection('tasks').doc(username);
+      // docRef.get().then((doc) => {doc.data()}).catch((error) => console.log(error))
+      docRef
+        // todo: archived
+        // .set({ archived: newActiveTasks }, { merge: true })
+        .set({ userTasks: newActiveTasks }, { merge: true })
+        .then((doc) => {
+          console.log('set', doc.data());
+        })
+        .catch((error) => {
+          console.log('Error setting document:', error);
+        });
+      commit('SET_TASKS', newActiveTasks);
+    },
+    setAlert({ commit }, payload) {
+      const { message, active } = payload;
+      commit('SET_ALERT', { message: message, active: active });
+    },
+    resetAlert({ commit }) {
+      setTimeout(() => {
+        commit('SET_ALERT', { message: '', active: false });
+      }, 4000);
     },
   },
 });

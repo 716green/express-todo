@@ -1,6 +1,12 @@
 <template>
   <div style="padding: 20px; margin: 50px;">
     <section>
+      <!-- <pre style="text-align: left">
+        <code>
+      {{ $store.getters.getState.tasks.userTasks }}
+
+        </code>
+      </pre> -->
       <Menu :show="showMenu" style="z-index: 2" @hideMenu="showMenu = false">
         <a @click="toggleMenu" :class="showMenu ? 'hb small' : 'hb'">
           <strong>

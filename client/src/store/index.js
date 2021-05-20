@@ -9,13 +9,16 @@ export const store = createStore({
     user: null,
     token: null,
     tasks: null,
-    showArchived: false,
+    showArchived: true,
     alert: {
       message: '',
       active: false,
     },
   },
   getters: {
+    getState(state) {
+      return state;
+    },
     getUser(state) {
       return state.user;
     },
@@ -26,13 +29,20 @@ export const store = createStore({
       return state.tasks;
     },
     getActiveTasks(state) {
+      // console.log({ stateTasks: state.tasks });
       return state?.tasks?.userTasks?.filter((task) => {
-        return task.status === 'active' || task.status === 'complete';
+        // console.log({ task });
+        return task?.status === 'active' || task?.status === 'complete';
       });
     },
     getArchivedTasks(state) {
-      return state?.tasks?.archived?.sort((a, b) => a.urgency - b.urgency);
+      return state?.tasks?.userTasks?.filter((task) => {
+        return task?.status === 'archived';
+      });
     },
+    // getArchivedTasks(state) {
+    //   return state?.tasks?.archived?.sort((a, b) => a.urgency - b.urgency);
+    // },
     getShowArchived(state) {
       return state.showArchived;
     },
@@ -117,7 +127,7 @@ export const store = createStore({
         .catch((error) => {
           console.log('Error setting document:', error);
         });
-      commit('SET_TASKS', newActiveTasks);
+      commit('SET_TASKS', getters.getTasks);
     },
     setAlert({ commit }, payload) {
       const { message, active } = payload;
@@ -129,24 +139,21 @@ export const store = createStore({
       }, 2000);
     },
     updateStatusByIndex({ commit, getters }, payload) {
-      let activeTasks = getters.getActiveTasks;
-      console.log(activeTasks);
+      let tasks = getters.getTasks;
       const { status, index } = payload;
       let email = getters.getUser['email'];
-      activeTasks[index]['status'] = status;
+      tasks.userTasks[index]['status'] = status;
       const docRef = db.collection('tasks').doc(email);
-      console.log(activeTasks[index]);
+      console.log({ userTasks: tasks.userTasks });
       docRef
-        // todo: archived
-        .set({ userTasks: activeTasks }, { merge: true })
+        .set({ userTasks: [...tasks.userTasks] }, { merge: true })
         .then(() => {
-          console.log('activeTasks updated', activeTasks);
+          console.log('activeTasks updated', tasks);
         })
         .catch((error) => {
           console.log('Error setting document:', error);
         });
-      // commit('SET_TASKS', activeTasks);
-      commit('UPDATE_STATUS_BY_INDEX', activeTasks);
+      commit('UPDATE_STATUS_BY_INDEX', tasks.userTasks);
     },
   },
 });

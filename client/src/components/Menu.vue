@@ -67,7 +67,6 @@
       },
 
       toggleArchived() {
-        console.log('toggleShowArchived');
         if (!this.$store.getters.getAlert.active) {
           this.$store.dispatch('toggleShowArchived');
           this.createAlert('Toggled Archived');

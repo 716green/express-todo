@@ -1,6 +1,7 @@
 <template>
   <div>
     <section>
+      <!-- {{ tasks }} -->
       <div class="info">
         <p
           v-if="activeTasksLength && newTaskNameLength && !newTaskUrgency"
@@ -38,9 +39,9 @@
         Add
       </button>
     </section>
-
-    <h2>{{ activeTasks ? 'Tasks' : 'Add a Task' }}</h2>
-    <section v-if="activeTasksLength" style="width: 100%;">
+    <!-- {{ existingCurrentTasks }} -->
+    <h2>{{ tasksLength ? 'Tasks' : 'Add a Task' }}</h2>
+    <section style="width: 100%;">
       <Task
         v-for="(task, i) in activeTasks"
         :key="i"
@@ -84,7 +85,7 @@
         newDueDate: this.newDate,
         showAddTask: false,
         description: null,
-        // updateTasks: [],
+        updateTasks: [],
       };
     },
     watch: {
@@ -124,11 +125,11 @@
         // if (!this.updateTasks) {
         //   this.updateTasks = [];
         // }
-        let activeTasks = this.activeTasks;
-        if (!this.activeTasks) {
-          activeTasks = [];
-        }
-        this.updateTasks = activeTasks.concat(this.newTaskObject);
+        let tasks = this.tasks.userTasks || [];
+        // if (!this.activeTasks) {
+        //   activeTasks = [];
+        // }
+        this.updateTasks = tasks.concat(this.newTaskObject);
         this.$store.dispatch('updateTasks', {
           newActiveTasks: this.updateTasks,
         });
@@ -153,7 +154,7 @@
     },
     computed: {
       existingCurrentTasks() {
-        return this.activeTasks;
+        return this.tasks?.userTasks;
       },
       newDate() {
         return ymd(
@@ -182,13 +183,13 @@
         };
       },
       tasks() {
-        return this.$store.getters.getTasks;
+        return this.$store?.getters?.getTasks;
       },
       activeTasks() {
-        return this.$store.getters.getActiveTasks;
+        return this.$store?.getters?.getActiveTasks;
       },
-      activeTasksLength() {
-        return this.activeTasks?.length;
+      tasksLength() {
+        return this.tasks?.length;
       },
       archivedTasks() {
         return this.$store.getters.getArchivedTasks;

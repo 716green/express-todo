@@ -6,7 +6,9 @@
           {{ percentCircle(urgency) }}
         </th>
         <th class="thname">
-          {{ name }}
+          <a @click="archiveTask">
+            {{ name }}
+          </a>
         </th>
         <th class="thdt" @click="rotateDate" v-if="showCreatedDate">
           🗓 {{ new Date(created).toDateString() }} [created]
@@ -20,16 +22,9 @@
         <!-- <th class="thdt" @click="rotateDate"></th> -->
         <!-- <th class="thdt">🗓{{ new Date(dueDate).toDateString() }}</th> -->
         <th class="thcode">
-          <code
-            @click="rotateStatus"
-            class="code"
-            :style="
-              status === 'active'
-                ? 'background-color: lightskyblue; color: black'
-                : ''
-            "
-            >{{ status }}</code
-          >
+          <code class="code" :style="codeClass" @click="rotateStatus">{{
+            status
+          }}</code>
         </th>
       </tr>
     </table>
@@ -50,7 +45,24 @@
         showCalendarIcon: true,
       };
     },
+    computed: {
+      codeClass() {
+        return this.status === 'active'
+          ? 'background-color: lightskyblue; color: black;'
+          : this.status === 'archived'
+          ? 'background-color: red; color: white;'
+          : '';
+      },
+    },
     methods: {
+      archiveTask() {
+        console.log('this', this.status);
+        if (this.status !== 'archived') {
+          this.setStatus('archived');
+        } else if (this.status === 'archived') {
+          console.log('No');
+        }
+      },
       rotateDate() {
         if (this.showCreatedDate) {
           this.showCreatedDate = false;

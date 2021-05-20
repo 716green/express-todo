@@ -5,6 +5,9 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import { auth } from './firebase';
 
+// import { createFBUserData } from './debug';
+// createFBUserData();
+
 let app = createApp(App);
 
 app.use(store);

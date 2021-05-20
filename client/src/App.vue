@@ -1,20 +1,26 @@
 <template>
-  <section>
-    <Main></Main>
-    <Menu :show="showMenu">
-      <a @click="toggleMenu" :class="showMenu ? 'hb small' : 'hb'">
-        <strong>
-          {{ showMenu ? '°' : '≣' }}
-        </strong>
-      </a>
-    </Menu>
-    <!-- {{ alertPopup }} -->
-    <Alert
-      v-if="alertPopup.active"
-      class="alert"
-      :message="alertPopup.message"
-    />
-  </section>
+  <div style="padding: 20px; margin: 50px;">
+    <section>
+      <Menu :show="showMenu" style="z-index: 2" @hideMenu="showMenu = false">
+        <a @click="toggleMenu" :class="showMenu ? 'hb small' : 'hb'">
+          <strong>
+            {{ showMenu ? '°' : '≣' }}
+          </strong>
+        </a>
+      </Menu>
+      <Main style="z-index: 1" />
+      <Alert
+        v-if="alertPopup.active"
+        class="alert"
+        :message="alertPopup.message"
+      />
+    </section>
+    <div
+      v-if="showMenu"
+      style="z-index: 0; position: fixed; top: 0; left: 0; width: 100%; height: 100vh;"
+      @click="closeMenu"
+    ></div>
+  </div>
 </template>
 
 <script>
@@ -30,6 +36,11 @@
       };
     },
     methods: {
+      closeMenu() {
+        if (this.showMenu === true) {
+          this.showMenu = false;
+        }
+      },
       toggleMenu() {
         this.showMenu = !this.showMenu;
       },
@@ -59,7 +70,6 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: black;
-    margin-top: 60px;
   }
 
   .alert {
@@ -68,6 +78,7 @@
     left: 0;
     margin: 10px;
     padding: 10px;
+    z-index: 2;
   }
 
   .hb {

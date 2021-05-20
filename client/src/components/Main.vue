@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <h1>Task Management</h1>
+    <h1 style="padding: 0; margin: 0; margin-bottom: 50px;">Task Management</h1>
     <img
       v-if="user && user.photoURL !== null"
       style="border-radius: 50%; width: 100px"
@@ -8,7 +8,7 @@
     />
     <div class="buttons">
       <button class="primary" v-if="!user" @click="userLogin">Login</button>
-      <button class="secondary" v-else @click="userLogout">Logout</button>
+      <!-- <button class="secondary" v-else @click="userLogout">Logout</button> -->
     </div>
     <section v-if="user && user.uid !== null">
       <Tasks />
@@ -25,9 +25,9 @@
   export default {
     name: 'Main',
     methods: {
-      userLogout() {
-        auth.signOut();
-      },
+      // userLogout() {
+      //   auth.signOut();
+      // },
       userLogin() {
         const provider = new firebase.auth.GithubAuthProvider();
         auth

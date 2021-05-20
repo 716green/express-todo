@@ -27,7 +27,7 @@ export const store = createStore({
     },
     getActiveTasks(state) {
       return state?.tasks?.userTasks?.filter((task) => {
-        return task.status === 'active';
+        return task.status === 'active' || task.status === 'complete';
       });
     },
     getArchivedTasks(state) {
@@ -49,7 +49,7 @@ export const store = createStore({
     },
     SET_TASKS(state, tasks) {
       state.tasks = tasks;
-      console.log(state.tasks);
+      // console.log(state.tasks);
     },
     TOGGLE_SHOW_ARCHIVED(state, value) {
       state.showArchived = value;
@@ -62,6 +62,9 @@ export const store = createStore({
         store.dispatch('resetAlert');
       }
     },
+    UPDATE_STATUS_BY_INDEX(state, value) {
+      state.activeTasks = value;
+    },
   },
   actions: {
     toggleShowArchived({ commit, state }) {
@@ -70,6 +73,7 @@ export const store = createStore({
     setUser({ commit }, user) {
       let userInfo = null;
       if (user) {
+        // console.log({ user });
         const { uid, displayName, photoURL, email } = user;
         userInfo = {
           uid,
@@ -84,13 +88,14 @@ export const store = createStore({
       commit('SET_TOKEN', token);
       sessionStorage.setItem('token', token);
     },
-    setTasks({ commit }, username) {
-      const docRef = db.collection('tasks').doc(username);
+    setTasks({ commit, getters }) {
+      let email = getters.getUser['email'];
+      const docRef = db.collection('tasks').doc(email);
       docRef
         .get()
         .then((doc) => {
           if (doc.exists) {
-            console.log('Document data:', doc.data());
+            // console.log('Document data:', doc.data());
             commit('SET_TASKS', doc.data());
           } else {
             console.log('No such document!');
@@ -100,13 +105,11 @@ export const store = createStore({
           console.log('Error getting document:', error);
         });
     },
-    updateTasks({ commit }, payload) {
-      const { username, newActiveTasks } = payload;
-      const docRef = db.collection('tasks').doc(username);
-      // docRef.get().then((doc) => {doc.data()}).catch((error) => console.log(error))
+    updateTasks({ commit, getters }, payload) {
+      const { newActiveTasks } = payload;
+      let email = getters.getUser['email'];
+      const docRef = db.collection('tasks').doc(email);
       docRef
-        // todo: archived
-        // .set({ archived: newActiveTasks }, { merge: true })
         .set({ userTasks: newActiveTasks }, { merge: true })
         .then((doc) => {
           console.log('set', doc.data());
@@ -123,7 +126,27 @@ export const store = createStore({
     resetAlert({ commit }) {
       setTimeout(() => {
         commit('SET_ALERT', { message: '', active: false });
-      }, 4000);
+      }, 2000);
+    },
+    updateStatusByIndex({ commit, getters }, payload) {
+      let activeTasks = getters.getActiveTasks;
+      console.log(activeTasks);
+      const { status, index } = payload;
+      let email = getters.getUser['email'];
+      activeTasks[index]['status'] = status;
+      const docRef = db.collection('tasks').doc(email);
+      console.log(activeTasks[index]);
+      docRef
+        // todo: archived
+        .set({ userTasks: activeTasks }, { merge: true })
+        .then(() => {
+          console.log('activeTasks updated', activeTasks);
+        })
+        .catch((error) => {
+          console.log('Error setting document:', error);
+        });
+      // commit('SET_TASKS', activeTasks);
+      commit('UPDATE_STATUS_BY_INDEX', activeTasks);
     },
   },
 });

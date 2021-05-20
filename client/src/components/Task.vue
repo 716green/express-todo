@@ -8,10 +8,28 @@
         <th class="thname">
           {{ name }}
         </th>
-        <th class="thdt">🗓{{ new Date(created).toDateString() }}</th>
-        <th class="thdt">🗓{{ new Date(dueDate).toDateString() }}</th>
+        <th class="thdt" @click="rotateDate" v-if="showCreatedDate">
+          🗓 {{ new Date(created).toDateString() }} [created]
+        </th>
+        <th class="thdt" @click="rotateDate" v-if="showDueDate">
+          🗓 {{ new Date(dueDate).toDateString() }} [due]
+        </th>
+        <th class="thdt" @click="rotateDate" v-if="showCalendarIcon">
+          🗓 [show]
+        </th>
+        <!-- <th class="thdt" @click="rotateDate"></th> -->
+        <!-- <th class="thdt">🗓{{ new Date(dueDate).toDateString() }}</th> -->
         <th class="thcode">
-          <code class="code">{{ status }}</code>
+          <code
+            @click="rotateStatus"
+            class="code"
+            :style="
+              status === 'active'
+                ? 'background-color: lightskyblue; color: black'
+                : ''
+            "
+            >{{ status }}</code
+          >
         </th>
       </tr>
     </table>
@@ -22,12 +40,45 @@
   import { percentCircle } from '../filters/filters';
   export default {
     name: 'Task',
-    props: ['created', 'name', 'urgency', 'status', 'dueDate'],
+    props: ['created', 'name', 'urgency', 'status', 'dueDate', 'taskIndex'],
     data() {
       return {
         percentCircle,
         showDates: true,
+        showCreatedDate: false,
+        showDueDate: false,
+        showCalendarIcon: true,
       };
+    },
+    methods: {
+      rotateDate() {
+        if (this.showCreatedDate) {
+          this.showCreatedDate = false;
+          this.showDueDate = true;
+          this.showCalendarIcon = false;
+        } else if (this.showDueDate) {
+          this.showDueDate = false;
+          this.showCreatedDate = false;
+          this.showCalendarIcon = true;
+        } else if (this.showCalendarIcon) {
+          this.showCalendarIcon = false;
+          this.showCreatedDate = true;
+          this.showDueDate = false;
+        }
+      },
+      rotateStatus() {
+        if (this.status === 'complete') {
+          this.setStatus('active');
+        } else if (this.status === 'active') {
+          this.setStatus('complete');
+        }
+      },
+      setStatus(newStatus) {
+        this.$store.dispatch('updateStatusByIndex', {
+          status: newStatus,
+          index: this.taskIndex,
+        });
+      },
     },
   };
 </script>
@@ -36,7 +87,13 @@
   table {
     margin: 0;
   }
+  th {
+    text-align: left;
+  }
 
+  tr {
+    border: 1px dashed lightblue;
+  }
   .th {
     width: 20%;
   }
@@ -45,6 +102,7 @@
     width: 200px;
     font-size: 0.8rem;
     margin: 0;
+    cursor: pointer;
   }
 
   .thname {
@@ -58,13 +116,13 @@
     text-align: end;
   }
   .code {
-    width: 100%;
-    text-align: end;
+    width: 150px;
+    text-align: center;
     cursor: pointer;
   }
 
   .color {
-    width: 15px;
+    width: 35px;
   }
 
   .card {
